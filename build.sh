@@ -45,3 +45,5 @@ docker build --tag binave/svnadmin:1.6.2-alpine3.6.5 \
     --build-arg REPO_MIRRORS_HOST=mirrors.tuna.tsinghua.edu.cn \
     --build-arg NETCAT_URL=http://${assets_url%.*}.1:$port \
     .
+
+cd - >/dev/null

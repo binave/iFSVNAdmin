@@ -14,27 +14,56 @@ build
 # auto build
 ./build.sh
 
+# build
+docker build --tag binave/svnadmin:1.6.2-alpine3.6.5 \
+    --build-arg ALPINE_VERSION=3.6.5 \
+    --build-arg REPO_MIRRORS_HOST=mirrors.tuna.tsinghua.edu.cn \
+    --build-arg NETCAT_URL=http://${assets_url%.*}.1:$port \
+    .
+
 ```
 
-run
+--build-arg|description|default value
+:--:|--|--
+ALPINE_VERSION|alpine-linux version|3.6.5
+REPO_MIRRORS_HOST|apk source host|dl-cdn.alpinelinux.org
+NETCAT_URL|iF.SVNAdmin package|https://github.com/mfreiholz/iF.SVNAdmin/archive/stable-1.6.2.tar.gz
+SRV_URI_PREFIX|admin url `prefix`|svnadmin
+SVN_DATA_DIR|svn url `prefix` and repositories `path`|/svn
+
+<br/>
+
+Run
 
 ```sh
 docker run --detach \
     --name ifsvn \
     --restart always \
-    --publish 80:80 --publish 443:443 --publish 3690:3690 \
+    --publish 80:80 --publish 443:443 \
     --volume /opt/ifsvn:/svn \
     binave/svnadmin:1.6.2-alpine3.6.5
 
 ```
+path (in containerd)|description
+--|--
+/var/www/localhost/htdocs|apache root
+/opt/svnadmin/data/userroleassignments.ini|role data
+
+<br/>
+
+#### Administrator page:
 
 http://127.0.0.1/svnadmin<br/>
-admin<br/>
-admin
 
+user|password
+--|--
+admin|admin
+
+<br/>
+
+#### Checkout
 
 ```sh
+# http method: OPTIONS
 svn co http://127.0.0.1/svn
 ```
-
-

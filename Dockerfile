@@ -1,5 +1,5 @@
 
-ARG ALPINE_VERSION=3.5
+ARG ALPINE_VERSION=3.6.5
 
 FROM alpine:$ALPINE_VERSION
 
@@ -40,28 +40,36 @@ RUN export SVN_PARENT_PATH=$SVN_DATA_DIR/repositories \
 ;                \
     apk add --no-cache apache2 apache2-utils apache2-webdav mod_dav_svn && \
         apk add --no-cache subversion php7 php7-apache2 php7-session php7-json php7-ldap php7-xml || exit 1; \
-	sed -i -e 's@^;\(extension=.*ldap\)@\1@' /etc/php7/php.ini && \
+	sed -i 's@^;\(extension=.*ldap\)@\1@' /etc/php7/php.ini && \
+    sed -i 's@^\(ErrorLog \).*@\1/proc/self/fd/2@; \
+    s@#\(CustomLog \).*\( common\)$@\1/proc/self/fd/1\2@; \
+    s@CustomLog.*combined$@#&@' /etc/apache2/httpd.conf; \
+:                     \
+:   decompress file   \
+;                     \
     mkdir -pv /run/apache2/ && cd /run/apache2/ && \
     printf "%s\n" \
-H4sIAAAAAAAAA+3UW2/TMBQA4D77VxwGYhJSmt4jyKgU1hYmlbZKuvHQTpWbuEtEGgfbCdq0H4/T \
-0DCYoE/lIs734vj4+NI6J2vOlVSCpnUZ1o6koVmWtWu1H9tGt2PVmh390Oo0u0W82Wq2OjVoHOtA \
-D2VSUQFQE/qP+FXeofF/1NMn5jpKTBkSsv0YRAKMNIdn3tVkNXPc4WSum/m7MjBw5s5qcOGaPk82 \
-NlE888N9qud9mLqD1ehiPLTJAgxZDjjn50PP24XhGu7vYUlAS0WUqA2cLm4Ez1J5vUyWycLUzQt4 \
-DaLonUL/0Qo28UP+OQHDBZpSP2Svyub704GZU2HG/MYsR1s2ITJPJBM5A8MIKNtyvYax4YIV2yeB \
-7hSX+/hXG0YcScUSI+VCQbv3sgHPidiCsQFTZMl+AzNUKg3qaRTYpAz5KgZjMJq6w7fu9HIysMmf \
-vuafktk6Z0JGPKkX13qUPQ7Wf6Nda7Z1htXtdNtWUf+9XgPr/3cYcxq850EWMwhovtKVstqWXTOT \
-uo6idfWa6/jqa05dcvJgJs1UeHdwbpVVzCZnY+5Tpd87MHWov/suDJwr0J3dsy7GGRUsUTOqwn1k \
-rOvxWxSmZaqjF57fpgzeUBn5VWhCtwxOvOoFB5elXEaKi9uTKulSfxhGUcyqwJ3exvF9JmUVdtmn \
-LBIMchpHgZHpGeTM3B+///fWNkIIIYQQQgghhBBCCCGEEEIIIYT+D18AH/jsdwAoAAA= \
+H4sIAAAAAAAAA+3TT2/aMBQAcM7+FG+sWk8mJm1hG1W1rMBWiUEVaHdoK2QS00QDO7OdbK364edA \
+ybpVGqfun97v4vj5OXZiv5lS1ljNs4ZJak+EOe12e9U6P7fsYJ/VmvuM+X67ub/n11jTb/qtGrCn \
+2tBDubFcA9S0+xG/yts2/o96/sybpdIzCTHCAhUdsvwUpxpoVsDO+Hw4PQ3C3nDimsn7daAbTIJp \
+9yT0IiXnHWJVHiWb1PH44yjsTvsng16HXAA164Hg+Lg3Hq/CcAV3d5DpVNo57F5ca5Vn5upSXspd \
+OHqU3SFRor5IoCHwjEeJeL1uftwJeAXX3kJde+tRv0OIKaQRuhBAaczFUrl30LnSolxQxq5Tnufj \
+L6R0kRorJM2UtrDXesXgBSF6CXQOns7lZgUvsTaLG1kad4j4KiJY9YF2+6Ow9y4cnQ27UN95Uyd/ \
++ny3MfmsENqkSjbK83ySNbbWv39f/4w1WYuV9d9iB1j/v8NA8fiDivOFgJgXU1c20+W66+XGFVU6 \
+q668i0/vcxpGkQczeW6T261zq6xytiu8MyPOJv2XMJLkcKAibt0lBM+NHxFwusE5uM7q2WWfci2k \
+PeU22UQGrlK/R8vXlAOBW2Vykwl4y00aVaEhXwqoj6vbDqHIlEmt0jf1KsntSPfThagCt26ZIIqE \
+MVU4FJ/zVAso+CKNae5mkENvs/2jv77eEUIIIYQQQgghhBBCCCGEEEIIIfT/+QYa6cAlACgAAA== \
 | base64 -d | tar -xzvf - || exit 1; \
     sed -i "s@SVNParentPath@& $SVN_PARENT_PATH@; \
     s@AuthUserFile@& $SVN_PASSWORD_FILE@; \
-    s@AuthzSVNAccessFile@& $SVN_ACCESS_FILE@" subversion.conf && \
+    s@AuthzSVNAccessFile@& $SVN_ACCESS_FILE@; \
+    s@\(Location \).*\(>\)@\1$SVN_DATA_DIR\2@" subversion.conf && \
+    chmod 644 subversion.conf && \
     mv -v subversion.conf /etc/apache2/conf.d/ && \
     sed -i "s@\$SVN_DATA_DIR@$SVN_DATA_DIR@g; \
-    s@\$SVN_PARENT_PATH@$SVN_PARENT_PATH@; \
-    s@\$SVN_PASSWORD_FILE@$SVN_PASSWORD_FILE@; \
-    s@\$SVN_ACCESS_FILE@$SVN_ACCESS_FILE@;" bootstrap.sh && \
+    s@\$SVN_PARENT_PATH@$SVN_PARENT_PATH@g; \
+    s@\$SVN_PASSWORD_FILE@$SVN_PASSWORD_FILE@g; \
+    s@\$SVN_ACCESS_FILE@$SVN_ACCESS_FILE@g;" bootstrap.sh && \
     chmod +x bootstrap.sh && \
 	ln -sv /opt/$SRV_URI_PREFIX /var/www/localhost/htdocs/$SRV_URI_PREFIX && \
 	chown -R apache:apache /opt/$SRV_URI_PREFIX/data; \
@@ -75,8 +83,6 @@ LBIMchpHgZHpGeTM3B+///fWNkIIIYQQQgghhBBCCCGEEEIIIYT+D18AH/jsdwAoAAA= \
 
 ENV HOME /home
 
-EXPOSE 80 443 3690
-
-VOLUME ["/var/log/apache2"]
+EXPOSE 80 443
 
 ENTRYPOINT ["/run/apache2/bootstrap.sh"]
