@@ -40,7 +40,6 @@ RUN export SVN_PARENT_PATH=$SVN_DATA_DIR/repositories \
 ;                \
     apk add --no-cache apache2 apache2-utils apache2-webdav mod_dav_svn && \
         apk add --no-cache subversion php7 php7-apache2 php7-session php7-json php7-ldap php7-xml || exit 1; \
-	sed -i 's@^;\(extension=.*ldap\)@\1@' /etc/php7/php.ini && \
     sed -i 's@^\(ErrorLog \).*@\1/proc/self/fd/2@; \
     s@#\(CustomLog \).*\( common\)$@\1/proc/self/fd/1\2@; \
     s@CustomLog.*combined$@#&@' /etc/apache2/httpd.conf; \
