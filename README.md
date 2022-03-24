@@ -36,11 +36,16 @@ SVN_DATA_DIR|svn url `prefix` and repositories `path`|/svn
 Run
 
 ```sh
+
+[ -f /etc/timezone ] || echo "Asia/Shanghai" > /etc/timezone
+
 docker run --detach \
     --name ifsvn \
     --restart always \
     --publish 80:80 --publish 443:443 \
     --volume /opt/ifsvn:/svn \
+    --volume /etc/timezone:/etc/timezone:ro \
+    --volume /etc/localtime:/etc/localtime:ro \
     binave/svnadmin:1.6.2-alpine3.6.5
 
 ```

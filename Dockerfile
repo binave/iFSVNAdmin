@@ -11,7 +11,8 @@ ARG REPO_MIRRORS_HOST=dl-cdn.alpinelinux.org
 ARG SRV_URI_PREFIX=svnadmin
 ARG SVN_DATA_DIR=/svn
 
-RUN export SVN_PARENT_PATH=$SVN_DATA_DIR/repositories \
+RUN set -e; \
+    export SVN_PARENT_PATH=$SVN_DATA_DIR/repositories \
         SVN_PASSWORD_FILE=$SVN_DATA_DIR/conf/passwd \
         SVN_ACCESS_FILE=$SVN_DATA_DIR/conf/authz; \
     sed -i 's@^root::@root:!:@' /etc/shadow; \
@@ -71,6 +72,7 @@ MVU4FJ/zVAso+CKNae5mkENvs/2jv77eEUIIIYQQQgghhBBCCCGEEEIIIfT/+QYa6cAlACgAAA== \
     s@\$SVN_ACCESS_FILE@$SVN_ACCESS_FILE@g;" bootstrap.sh && \
     chmod +x bootstrap.sh && \
 	ln -sv /opt/$SRV_URI_PREFIX /var/www/localhost/htdocs/$SRV_URI_PREFIX && \
+    sed -i 's@^\(Repository\(Delete\|Dump\)Enabled=\).*@\1true@' /opt/$SRV_URI_PREFIX/data/config.ini && \
 	chown -R apache:apache /opt/$SRV_URI_PREFIX/data; \
 :                \
 :    timezone    \
@@ -81,6 +83,8 @@ MVU4FJ/zVAso+CKNae5mkENvs/2jv77eEUIIIYQQQgghhBBCCCGEEEIIIfT/+QYa6cAlACgAAA== \
     apk del .tz
 
 ENV HOME /home
+
+ENV PS1='\u@\h:\W\$ '
 
 EXPOSE 80 443
 
