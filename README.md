@@ -37,6 +37,8 @@ Run
 
 ```sh
 
+# China
+[ -f /usr/share/zoneinfo/Asia/Shanghai ] && ln -fsv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 [ -f /etc/timezone ] || echo "Asia/Shanghai" > /etc/timezone
 
 docker run --detach \

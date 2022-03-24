@@ -73,14 +73,7 @@ MVU4FJ/zVAso+CKNae5mkENvs/2jv77eEUIIIYQQQgghhBBCCCGEEEIIIfT/+QYa6cAlACgAAA== \
     chmod +x bootstrap.sh && \
 	ln -sv /opt/$SRV_URI_PREFIX /var/www/localhost/htdocs/$SRV_URI_PREFIX && \
     sed -i 's@^\(Repository\(Delete\|Dump\)Enabled=\).*@\1true@' /opt/$SRV_URI_PREFIX/data/config.ini && \
-	chown -R apache:apache /opt/$SRV_URI_PREFIX/data; \
-:                \
-:    timezone    \
-;                \
-    apk add --no-cache --virtual .tz tzdata || exit 1; \
-    cp -fv /usr/share/zoneinfo/Asia/Shanghai /etc/localtime || exit 1; \
-    echo "Asia/Shanghai" > /etc/timezone && \
-    apk del .tz
+	chown -R apache:apache /opt/$SRV_URI_PREFIX/data;
 
 ENV HOME /home
 
